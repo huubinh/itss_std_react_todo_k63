@@ -5,7 +5,7 @@ import React, { useState } from "react";
 　・Enterをクリックされたら入力された文字を使って新しいTodoを作成する
 */
 function Input({ addNewItem }) {
-  const [input, setInput] = useState({});
+  const [input, setInput] = useState("");
 
   return (
     <div className="panel-block">

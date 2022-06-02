@@ -26,6 +26,19 @@ function Todo() {
     { key: getKey(), text: "明日の準備をする", done: false },
     /* テストコード 終了 */
   ]);
+  const [activeTab, setActiveTab] = React.useState(0);
+  const [displayedItems, setDisplayedItems] = React.useState(items);
+
+  function onItemClicked(key) {
+    const newItemList = items.map((item) =>
+      item.key === key ? { ...item, done: !item.done } : item
+    );
+    const newDisplayedItemList = displayedItems.map((item) =>
+      item.key === key ? { ...item, done: !item.done } : item
+    );
+    putItems(newItemList);
+    setDisplayedItems(newDisplayedItemList);
+  }
 
   function addNewItem(newText) {
     const newItemList = [
@@ -33,23 +46,40 @@ function Todo() {
       { key: getKey(), text: newText, done: false },
     ];
     putItems(newItemList);
+    if (activeTab !== 2) {
+      const newDisplayedItemList = [
+        ...items,
+        { key: getKey(), text: newText, done: false },
+      ];
+      setDisplayedItems(newDisplayedItemList);
+    }
   }
 
-  function onClick(key) {
-    const newItemList = items.map((item) =>
-      item.key === key ? { ...item, done: !item.done } : item
-    );
-    putItems(newItemList);
+  function filterItems(activeTab) {
+    setActiveTab(activeTab);
+    if (activeTab === 0) setDisplayedItems(items);
+    else if (activeTab === 1) {
+      const newDisplayedItems = items.filter(
+        (displayedItem) => displayedItem.done === false
+      );
+      setDisplayedItems(newDisplayedItems);
+    } else {
+      const newDisplayedItems = items.filter(
+        (displayedItem) => displayedItem.done === true
+      );
+      setDisplayedItems(newDisplayedItems);
+    }
   }
 
   return (
     <div className="panel">
       <div className="panel-heading">ITSS ToDoアプリ</div>
       <Input addNewItem={addNewItem} />
-      {items.map((item) => (
-        <TodoItem key={item.key} item={item} onClick={onClick} />
+      <Filter activeTab={activeTab} filterItems={filterItems} />
+      {displayedItems.map((item) => (
+        <TodoItem key={item.key} item={item} onItemClicked={onItemClicked} />
       ))}
-      <div className="panel-block">{items.length} items</div>
+      <div className="panel-block">{displayedItems.length} items</div>
     </div>
   );
 }
