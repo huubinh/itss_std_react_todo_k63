@@ -27,16 +27,25 @@ function Todo() {
     /* テストコード 終了 */
   ]);
 
+  function addNewItem(newText) {
+    const newItemList = [
+      ...items,
+      { key: getKey(), text: newText, done: false },
+    ];
+    putItems(newItemList);
+  }
+
   function onClick(key) {
-    const newItems = items.map((item) =>
+    const newItemList = items.map((item) =>
       item.key === key ? { ...item, done: !item.done } : item
     );
-    putItems(newItems);
+    putItems(newItemList);
   }
 
   return (
     <div className="panel">
       <div className="panel-heading">ITSS ToDoアプリ</div>
+      <Input addNewItem={addNewItem} />
       {items.map((item) => (
         <TodoItem key={item.key} item={item} onClick={onClick} />
       ))}
