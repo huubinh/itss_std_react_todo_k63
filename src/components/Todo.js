@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 /* 
   【Todoのデータ構成】
@@ -11,7 +11,7 @@ import React, { useState } from "react";
 import TodoItem from "./TodoItem";
 import Input from "./Input";
 import Filter from "./Filter";
-
+import ClearButton from "./ClearButton";
 /* カスタムフック */
 import useStorage from "../hooks/storage";
 
@@ -19,15 +19,14 @@ import useStorage from "../hooks/storage";
 import { getKey } from "../lib/util";
 
 function Todo() {
-  const [items, putItems] = React.useState([
-    /* テストコード 開始 */
-    { key: getKey(), text: "日本語の宿題", done: false },
-    { key: getKey(), text: "reactを勉強する", done: false },
-    { key: getKey(), text: "明日の準備をする", done: false },
-    /* テストコード 終了 */
-  ]);
-  const [activeTab, setActiveTab] = React.useState(0);
-  const [displayedItems, setDisplayedItems] = React.useState(items);
+  const [items, putItems, clearItems] = useStorage();
+  const [activeTab, setActiveTab] = useState(0);
+  const [displayedItems, setDisplayedItems] = useState([]);
+
+  useEffect(() => {
+    filterItems(activeTab);
+    //eslint-disable-next-line
+  }, [items]);
 
   function onItemClicked(key) {
     const newItemList = items.map((item) =>
@@ -46,13 +45,6 @@ function Todo() {
       { key: getKey(), text: newText, done: false },
     ];
     putItems(newItemList);
-    if (activeTab !== 2) {
-      const newDisplayedItemList = [
-        ...items,
-        { key: getKey(), text: newText, done: false },
-      ];
-      setDisplayedItems(newDisplayedItemList);
-    }
   }
 
   function filterItems(activeTab) {
@@ -71,6 +63,11 @@ function Todo() {
     }
   }
 
+  function clearList() {
+    setDisplayedItems([]);
+    clearItems();
+  }
+
   return (
     <div className="panel">
       <div className="panel-heading">ITSS ToDoアプリ</div>
@@ -80,6 +77,7 @@ function Todo() {
         <TodoItem key={item.key} item={item} onItemClicked={onItemClicked} />
       ))}
       <div className="panel-block">{displayedItems.length} items</div>
+      <ClearButton clearList={clearList} />
     </div>
   );
 }
